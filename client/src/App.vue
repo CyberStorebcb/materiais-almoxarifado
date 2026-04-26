@@ -478,8 +478,15 @@ const gridClass = computed(() => {
 /* Print rules precisam ser globais (fora do scoped) */
 @media print {
   @page {
-    size: A4 landscape;
+    /* Chrome/Edge costuma respeitar melhor tamanho explícito */
+    size: 297mm 210mm; /* A4 landscape */
     margin: 5mm;
+  }
+
+  html,
+  body {
+    width: 297mm;
+    height: 210mm;
   }
 }
 </style>
