@@ -179,6 +179,10 @@
 <script setup>
 import { computed, ref } from "vue";
 
+const props = defineProps({
+  printPages: { type: Number, default: 1 }
+});
+
 const meta = ref({
   contratada: "",
   municipio: "",
@@ -231,7 +235,21 @@ function blankRow() {
 const printRows = computed(() => {
   // Se estiver totalmente em branco, gera linhas extras para preenchimento manual no papel.
   if (isBlank.value) {
-    return Array.from({ length: 22 }, () => blankRow());
+    const pages = Math.max(1, Math.min(20, Math.floor(Number(props.printPages) || 1)));
+    const rowsPerPage = 22;
+    const total = pages * rowsPerPage;
+    return Array.from({ length: total }, (_, i) => ({
+      id: `blank-${i + 1}`,
+      codigo: "",
+      descricao: "",
+      umb: "",
+      qtdSolic: "",
+      qtdExp: "",
+      qtdBaix: "",
+      qtdDev: "",
+      serial: "",
+      sap: ""
+    }));
   }
   return rows.value;
 });
@@ -605,7 +623,40 @@ function clearRows() {
 }
 
 @media print {
-  /* Mantém o visual idêntico ao original, apenas para impressão */
+  /* Para impressão: remove "caixinhas" internas e deixa linhas */
+  .doc {
+    font-size: 1.12em;
+  }
+
+  .doc__title-line {
+    font-size: 16px;
+  }
+
+  .doc__title-sub {
+    font-size: 13px;
+  }
+
+  .meta__l {
+    font-size: 12px;
+  }
+
+  .meta__i,
+  .meta__ta {
+    font-size: 13px;
+  }
+
+  .t {
+    font-size: 12px;
+  }
+
+  .t th {
+    font-size: 12px;
+  }
+
+  .t__i {
+    font-size: 12px;
+  }
+
   .doc__btn,
   .t__del,
   .t__empty {
@@ -630,6 +681,24 @@ function clearRows() {
     border-color: #111827 !important;
     background: #ffffff !important;
     color: #111827 !important;
+  }
+
+  .meta__i,
+  .t__i {
+    border-width: 0 0 1px 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .meta__ta {
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
   }
 
   .t th {

@@ -141,14 +141,24 @@ async function baixarDocPdf() {
   const el = docPrintEl.value;
   if (!el) return;
 
+  // Ativa estilo "limpo" (sem caixinhas arredondadas) para exportação
+  el.classList.add("docprint--export");
+  await nextTick();
+
   const [{ jsPDF }, html2canvasMod] = await Promise.all([import("jspdf"), import("html2canvas")]);
   const html2canvas = html2canvasMod.default || html2canvasMod;
 
-  const canvas = await html2canvas(el, {
-    scale: Math.min(2, window.devicePixelRatio || 1),
-    backgroundColor: "#ffffff",
-    useCORS: true
-  });
+  let canvas;
+  try {
+    canvas = await html2canvas(el, {
+      // Qualidade: garantir >=2 e permitir até 3
+      scale: Math.min(3, Math.max(2, window.devicePixelRatio || 1)),
+      backgroundColor: "#ffffff",
+      useCORS: true
+    });
+  } finally {
+    el.classList.remove("docprint--export");
+  }
 
   const imgData = canvas.toDataURL("image/png");
   const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
@@ -372,6 +382,30 @@ const gridClass = computed(() => {
 
 .docprint {
   background: #ffffff;
+}
+
+.docprint--export :deep(input),
+.docprint--export :deep(textarea) {
+  border-radius: 0 !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.docprint--export :deep(.doc) {
+  /* aumenta legibilidade no PDF gerado */
+  font-size: 1.12em;
+}
+
+.docprint--export :deep(.t__i),
+.docprint--export :deep(.meta__i),
+.docprint--export :deep(.meta__ta) {
+  border-width: 0 0 1px 0 !important;
+  border-color: #111827 !important;
+}
+
+.docprint--export :deep(.meta__ta) {
+  border-width: 1px !important;
 }
 
 @media print {
