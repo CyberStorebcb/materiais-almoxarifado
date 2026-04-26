@@ -208,7 +208,7 @@ const gridClass = computed(() => {
   align-items: stretch;
   padding: clamp(0.9rem, 2vw, 1.6rem);
   width: 100%;
-  overflow: hidden;
+  overflow: auto;
   transition: grid-template-columns 220ms var(--ease-out, ease);
 }
 
@@ -239,6 +239,11 @@ const gridClass = computed(() => {
   flex-direction: column;
   box-shadow: var(--shadow);
   overflow: hidden;
+}
+
+.panel--docs,
+.panel--materiais {
+  scroll-margin-top: 92px;
 }
 
 .panel__header {
