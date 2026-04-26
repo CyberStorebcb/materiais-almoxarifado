@@ -498,12 +498,10 @@ async function enviarRegistrosOutlook() {
   const now = new Date();
   const dateStr = now.toLocaleDateString("pt-BR");
   const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  const pep = String(infoGeral.value.pep || "").trim() || String(registros.value?.[0]?.pep || "").trim();
 
   const html = `
 <div style="font-family:Segoe UI,Arial,sans-serif;font-size:13px;color:#0f172a;">
   <p style="margin:0 0 10px 0;">Segue tabela para baixa de obras.</p>
-  ${pep ? `<p style="margin:0 0 10px 0;"><b>PEP:</b> ${escapeHtml(pep)}</p>` : ""}
   <p style="margin:0 0 14px 0;color:#475569;font-size:12px;">Gerado em ${escapeHtml(dateStr)} ${escapeHtml(timeStr)}.</p>
   ${registrosToHtmlTable()}
   <p style="margin:14px 0 0 0;color:#475569;font-size:12px;">PDF anexado: ${escapeHtml(pdfName)}</p>
