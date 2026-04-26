@@ -15,48 +15,111 @@
     </header>
 
     <section class="doc__meta" aria-label="Dados do documento">
-      <div class="doc__grid">
-        <label class="f">
-          <span class="f__l">Contratante (Operador logístico / executor serviço de obra)</span>
-          <input v-model="meta.contratante" class="f__i" type="text" />
-        </label>
-        <label class="f">
-          <span class="f__l">Centro (Armazém / CD / depósito técnico)</span>
-          <input v-model="meta.centro" class="f__i" type="text" />
-        </label>
-        <label class="f">
-          <span class="f__l">Município</span>
-          <input v-model="meta.municipio" class="f__i" type="text" />
-        </label>
-        <label class="f">
-          <span class="f__l">Local de entrega</span>
-          <input v-model="meta.localEntrega" class="f__i" type="text" />
-        </label>
+      <div class="meta">
+        <div class="meta__row meta__row--head">
+          <div class="meta__cell meta__cell--l"></div>
+          <div class="meta__cell meta__cell--m"></div>
+          <div class="meta__cell meta__cell--r meta__obs-head">OBSERVAÇÃO</div>
+        </div>
 
-        <label class="f">
-          <span class="f__l">Área / responsável pela solicitação / equipe de campo</span>
-          <input v-model="meta.areaResponsavel" class="f__i" type="text" />
-        </label>
-        <label class="f">
-          <span class="f__l">Equipe de retirada do material / responsável</span>
-          <input v-model="meta.equipeRetirada" class="f__i" type="text" />
-        </label>
-        <label class="f">
-          <span class="f__l">Responsável</span>
-          <input v-model="meta.responsavel" class="f__i" type="text" />
-        </label>
-        <label class="f">
-          <span class="f__l">Data</span>
-          <input v-model="meta.data" class="f__i" type="date" />
-        </label>
-        <label class="f">
-          <span class="f__l">Hora</span>
-          <input v-model="meta.hora" class="f__i" type="time" />
-        </label>
-        <label class="f f--span2">
-          <span class="f__l">Observação</span>
-          <input v-model="meta.observacao" class="f__i" type="text" />
-        </label>
+        <div class="meta__row">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Contratada (Operador logístico / executora serviço de obra):</span>
+            <input v-model="meta.contratada" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Data procesamento da reserva:</span>
+            <input v-model="meta.dataProcReserva" class="meta__i" type="date" />
+          </label>
+          <div class="meta__cell meta__cell--r meta__obs" :style="{ gridRow: 'span 6' }">
+            <textarea v-model="meta.observacao" class="meta__ta" rows="9"></textarea>
+          </div>
+        </div>
+
+        <div class="meta__row">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Município:</span>
+            <input v-model="meta.municipio" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Horário procesamento da reserva:</span>
+            <input v-model="meta.horaProcReserva" class="meta__i" type="time" />
+          </label>
+        </div>
+
+        <div class="meta__row">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Localidade aplicação dos materiais:</span>
+            <input v-model="meta.localidadeAplicacao" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Data planejada para saque dos materiais:</span>
+            <input v-model="meta.dataPlanejadaSaque" class="meta__i" type="date" />
+          </label>
+        </div>
+
+        <div class="meta__row">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Área / setor:</span>
+            <input v-model="meta.areaSetor" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Horário planejado para saque dos materiais:</span>
+            <input v-model="meta.horaPlanejadaSaque" class="meta__i" type="time" />
+          </label>
+        </div>
+
+        <div class="meta__row">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Depósito (viatura ou eletricista) / equipe de campo:</span>
+            <input v-model="meta.depositoEquipe" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Placa do veículo:</span>
+            <input v-model="meta.placaVeiculo" class="meta__i" type="text" />
+          </label>
+        </div>
+
+        <div class="meta__row">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Requisição:</span>
+            <input v-model="meta.requisicao" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Data da requisição:</span>
+            <input v-model="meta.dataRequisicao" class="meta__i" type="date" />
+          </label>
+        </div>
+
+        <div class="meta__row meta__row--bottom">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Solicitado por:</span>
+            <input v-model="meta.solicitadoPor" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Número da ocorrência NR/INC:</span>
+            <input v-model="meta.nrInc" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--r2">
+            <span class="meta__l">Número do componente:</span>
+            <input v-model="meta.numeroComponente" class="meta__i" type="text" />
+          </label>
+        </div>
+
+        <div class="meta__row meta__row--bottom">
+          <label class="meta__cell meta__cell--l">
+            <span class="meta__l">Autorizado por:</span>
+            <input v-model="meta.autorizadoPor" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--m">
+            <span class="meta__l">Número PEP da obra:</span>
+            <input v-model="meta.pepObra" class="meta__i" type="text" />
+          </label>
+          <label class="meta__cell meta__cell--r2">
+            <span class="meta__l">Data da devolução:</span>
+            <input v-model="meta.dataDevolucao" class="meta__i" type="date" />
+          </label>
+        </div>
       </div>
     </section>
 
@@ -131,15 +194,24 @@
 import { ref } from "vue";
 
 const meta = ref({
-  contratante: "",
-  centro: "",
+  contratada: "",
   municipio: "",
-  localEntrega: "",
-  areaResponsavel: "",
-  equipeRetirada: "",
-  responsavel: "",
-  data: "",
-  hora: "",
+  localidadeAplicacao: "",
+  areaSetor: "",
+  depositoEquipe: "",
+  requisicao: "",
+  solicitadoPor: "",
+  autorizadoPor: "",
+  dataProcReserva: "",
+  horaProcReserva: "",
+  dataPlanejadaSaque: "",
+  horaPlanejadaSaque: "",
+  placaVeiculo: "",
+  dataRequisicao: "",
+  nrInc: "",
+  numeroComponente: "",
+  pepObra: "",
+  dataDevolucao: "",
   observacao: ""
 });
 
@@ -227,37 +299,97 @@ function clearRows() {
   border-bottom: 1px solid rgba(226, 232, 240, 0.95);
 }
 
-.doc__grid {
+.meta {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 0;
+  border: 1px solid rgba(203, 213, 225, 0.95);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.f {
+.meta__row {
   display: grid;
-  gap: 6px;
+  grid-template-columns: 1.05fr 0.9fr 0.95fr;
+  gap: 0;
+}
+
+.meta__row--head .meta__cell {
+  background: #f8fafc;
+  font-weight: 900;
+  font-size: 11px;
+  color: #111827;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meta__cell {
+  border-right: 1px solid rgba(203, 213, 225, 0.95);
+  border-bottom: 1px solid rgba(203, 213, 225, 0.95);
+  padding: 8px 10px;
   min-width: 0;
 }
 
-.f--span2 {
-  grid-column: span 2;
+.meta__row .meta__cell:last-child {
+  border-right: none;
 }
 
-.f__l {
+.meta__l {
+  display: block;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   color: #334155;
+  margin-bottom: 6px;
 }
 
-.f__i {
+.meta__i {
   width: 100%;
   min-width: 0;
-  padding: 9px 10px;
+  padding: 8px 9px;
   border-radius: 10px;
   border: 1px solid rgba(203, 213, 225, 0.95);
   background: #ffffff;
   color: #0f172a;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.meta__obs-head {
+  justify-content: center;
+}
+
+.meta__obs {
+  padding: 8px 10px;
+}
+
+.meta__ta {
+  width: 100%;
+  min-height: 100%;
+  resize: vertical;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(203, 213, 225, 0.95);
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.meta__cell--r2 {
+  border-right: none;
+}
+
+@media (max-width: 1000px) {
+  .meta__row {
+    grid-template-columns: 1fr;
+  }
+  .meta__row--head .meta__cell {
+    justify-content: flex-start;
+    padding-left: 10px;
+  }
+  .meta__cell {
+    border-right: none;
+  }
 }
 
 .doc__table {
@@ -425,10 +557,7 @@ function clearRows() {
 }
 
 @media (max-width: 1000px) {
-  .doc__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .f--span2 { grid-column: span 2; }
+  /* meta grid already adapts */
 }
 
 @media (max-width: 640px) {
