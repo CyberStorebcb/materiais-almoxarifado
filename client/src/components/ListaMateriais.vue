@@ -26,19 +26,19 @@
         <div class="order__grid" aria-label="Dados automáticos">
           <div class="order__field">
             <span class="order__label">NOTA</span>
-            <div class="order__static">{{ infoGeral.nota || "-" }}</div>
+            <div class="order__static">{{ infoGeral.nota || "" }}</div>
           </div>
           <div class="order__field">
             <span class="order__label">ODI</span>
-            <div class="order__static">{{ infoGeral.odi || "-" }}</div>
+            <div class="order__static">{{ infoGeral.odi || "" }}</div>
           </div>
           <div class="order__field">
             <span class="order__label">ODM</span>
-            <div class="order__static">{{ infoGeral.odm || "-" }}</div>
+            <div class="order__static">{{ infoGeral.odm || "" }}</div>
           </div>
           <div class="order__field">
             <span class="order__label">ODS</span>
-            <div class="order__static">{{ infoGeral.ods || "-" }}</div>
+            <div class="order__static">{{ infoGeral.ods || "" }}</div>
           </div>
         </div>
       </section>
@@ -113,12 +113,18 @@
           <tbody>
             <tr v-for="(m, idx) in itensFiltrados" :key="m.id ?? idx">
               <td class="list__iv">
-                <span class="list__badge" :data-iv="String(m.iv || '').toUpperCase()">{{ m.iv ?? "-" }}</span>
+                <span
+                  v-if="String(m.iv ?? '').trim()"
+                  class="list__badge"
+                  :data-iv="String(m.iv || '').toUpperCase()"
+                >
+                  {{ m.iv }}
+                </span>
               </td>
-              <td class="list__pep">{{ m.pep ?? "-" }}</td>
+              <td class="list__pep">{{ m.pep ?? "" }}</td>
               <td class="list__code">{{ formatarCodigo(m.codigo) }}</td>
-              <td class="list__desc">{{ m.descricao ?? "-" }}</td>
-              <td class="list__umb">{{ m.unidade ?? "-" }}</td>
+              <td class="list__desc">{{ m.descricao ?? "" }}</td>
+              <td class="list__umb">{{ m.unidade ?? "" }}</td>
               <td class="list__num">{{ formatarQtd(m.qtdSolicitada ?? m.quantidade ?? 0) }}</td>
               <td class="list__num">{{ formatarQtd(m.qtdBaixada ?? 0) }}</td>
               <td
@@ -158,7 +164,7 @@ function formatarQtd(n) {
 
 function formatarCodigo(codigo) {
   const s = String(codigo ?? "").trim();
-  if (!s) return "-";
+  if (!s) return "";
   if (!ocultarCodigos.value) return s;
   return s.slice(-4);
 }
@@ -209,15 +215,9 @@ const itensFiltrados = computed(() => {
 });
 
 onMounted(async () => {
-  try {
-    const r = await fetch("/api/materiais");
-    if (!r.ok) throw new Error("Resposta inválida");
-    itens.value = await r.json();
-  } catch {
-    erro.value = "Não foi possível carregar os materiais. O servidor está em execução?";
-  } finally {
-    loading.value = false;
-  }
+  // Não carregar dados de demonstração automaticamente.
+  // A lista deve ser preenchida apenas após digitar um PEP válido.
+  loading.value = false;
 });
 
 let pepTimer = null;
