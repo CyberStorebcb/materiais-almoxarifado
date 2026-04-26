@@ -605,7 +605,7 @@ function clearRows() {
 }
 
 @media print {
-  /* Deixa aparência de formulário em branco */
+  /* Mantém o visual idêntico ao original, apenas para impressão */
   .doc__btn,
   .t__del,
   .t__empty {
@@ -628,22 +628,8 @@ function clearRows() {
   .meta__ta,
   .t__i {
     border-color: #111827 !important;
-    background: transparent !important;
+    background: #ffffff !important;
     color: #111827 !important;
-  }
-
-  /* Visual de “linha” para escrever */
-  .meta__i,
-  .t__i {
-    border-width: 0 0 1px 0 !important;
-    border-radius: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-
-  .meta__ta {
-    border-width: 1px !important;
-    border-radius: 0 !important;
   }
 
   .t th {
