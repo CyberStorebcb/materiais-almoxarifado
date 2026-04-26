@@ -25,7 +25,7 @@
         </header>
         <div class="panel__body panel__body--scroll">
           <div ref="docPrintEl" class="docprint">
-            <DocumentoExpedicaoDevolucao />
+            <DocumentoExpedicaoDevolucao :printPages="printPages" />
           </div>
         </div>
       </section>
@@ -99,6 +99,7 @@ import DocumentoExpedicaoDevolucao from "./components/DocumentoExpedicaoDevoluca
 const docsEl = ref(null);
 const materiaisEl = ref(null);
 const docPrintEl = ref(null);
+const printPages = ref(1);
 const previewMode = ref("full"); // 'full' | 'compact' | 'hidden'
 const activePage = ref("home"); // 'home' | 'doc'
 
@@ -124,12 +125,18 @@ function irParaMateriais() {
 
 async function imprimirDoc() {
   if (activePage.value !== "doc") return;
+  const n = pedirPaginas();
+  if (!n) return;
+  printPages.value = n;
   await nextTick();
   window.print();
 }
 
 async function baixarDocPdf() {
   if (activePage.value !== "doc") return;
+  const n = pedirPaginas();
+  if (!n) return;
+  printPages.value = n;
   await nextTick();
   const el = docPrintEl.value;
   if (!el) return;
@@ -166,6 +173,14 @@ async function baixarDocPdf() {
   }
 
   pdf.save(`DOC-EXPEDICAO-DEVOLUCAO-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+function pedirPaginas() {
+  const raw = window.prompt("Quantas páginas A4 (paisagem) deseja gerar?", String(printPages.value || 1));
+  if (raw == null) return null; // cancelado
+  const n = Math.max(1, Math.min(20, Math.floor(Number(raw))));
+  if (!Number.isFinite(n) || n < 1) return 1;
+  return n;
 }
 
 function togglePreview() {
@@ -365,11 +380,6 @@ const gridClass = computed(() => {
     padding: 0 !important;
   }
 
-  @page {
-    size: A4 landscape;
-    margin: 5mm;
-  }
-
   .app__header,
   .app__actions,
   .panel__header,
@@ -396,6 +406,15 @@ const gridClass = computed(() => {
     padding: 0 !important;
     margin: 0 !important;
   }
+}
+
+/* Regras de página precisam ser globais para não serem "scoped" */
+:global(@page) {
+  /* Chrome/Edge: A4 landscape */
+  size: A4 landscape;
+  /* Fallback */
+  size: landscape;
+  margin: 5mm;
 }
 
 .panel__header {
