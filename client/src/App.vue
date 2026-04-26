@@ -144,10 +144,10 @@ async function baixarDocPdf() {
   });
 
   const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
-  const pageW = 210;
-  const pageH = 297;
+  const pageW = 297;
+  const pageH = 210;
   const margin = 10;
   const usableW = pageW - margin * 2;
   const imgH = (canvas.height * usableW) / canvas.width;
@@ -365,6 +365,11 @@ const gridClass = computed(() => {
     padding: 0 !important;
   }
 
+  @page {
+    size: A4 landscape;
+    margin: 5mm;
+  }
+
   .app__header,
   .app__actions,
   .panel__header,
@@ -391,11 +396,6 @@ const gridClass = computed(() => {
     padding: 0 !important;
     margin: 0 !important;
   }
-}
-
-:global(@page) {
-  size: A4;
-  margin: 5mm;
 }
 
 .panel__header {
