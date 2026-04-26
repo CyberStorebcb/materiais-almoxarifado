@@ -280,12 +280,12 @@ function clearRows() {
 
 .doc__title-line {
   font-weight: 800;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .doc__title-sub {
   font-weight: 700;
-  font-size: 12px;
+  font-size: 12.5px;
   color: #334155;
 }
 
@@ -306,7 +306,7 @@ function clearRows() {
 .meta__head {
   background: #f8fafc;
   font-weight: 900;
-  font-size: 11px;
+  font-size: 12px;
   color: #111827;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -329,7 +329,7 @@ function clearRows() {
 
 .meta__l {
   display: block;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #111827;
   margin-bottom: 4px;
@@ -343,7 +343,7 @@ function clearRows() {
   border: 1px solid rgba(17, 24, 39, 0.35);
   background: #ffffff;
   color: #0f172a;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 
 .meta__obs-head {
@@ -365,7 +365,7 @@ function clearRows() {
   border: 1px solid rgba(17, 24, 39, 0.35);
   background: #ffffff;
   color: #0f172a;
-  font-size: 12px;
+  font-size: 12.5px;
   font-family: inherit;
 }
 
@@ -453,7 +453,7 @@ function clearRows() {
 .t {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .t th,
@@ -499,7 +499,7 @@ function clearRows() {
   padding: 7px 8px;
   border-radius: 10px;
   border: 1px solid rgba(203, 213, 225, 0.95);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .t__i--mono {
