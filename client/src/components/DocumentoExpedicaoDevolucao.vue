@@ -332,12 +332,15 @@ function clearRows() {
 .doc__title-line {
   font-weight: 800;
   font-size: 14px;
+  color: #000000;
+  line-height: 1.1;
 }
 
 .doc__title-sub {
   font-weight: 700;
   font-size: 12.5px;
-  color: #334155;
+  color: #000000;
+  line-height: 1.1;
 }
 
 .doc__meta {
@@ -358,7 +361,7 @@ function clearRows() {
   background: #f8fafc;
   font-weight: 900;
   font-size: 12px;
-  color: #111827;
+  color: #000000;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   min-height: 32px;
@@ -370,7 +373,7 @@ function clearRows() {
 .meta__cell {
   border-right: 1px solid rgba(17, 24, 39, 0.55);
   border-bottom: 1px solid rgba(17, 24, 39, 0.55);
-  padding: 6px 8px;
+  padding: 5px 8px;
   min-width: 0;
 }
 
@@ -381,9 +384,10 @@ function clearRows() {
 .meta__l {
   display: block;
   font-size: 11px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 4px;
+  font-weight: 800;
+  color: #000000;
+  margin-bottom: 2px;
+  line-height: 1.05;
 }
 
 .meta__i {
@@ -395,6 +399,7 @@ function clearRows() {
   background: #ffffff;
   color: #0f172a;
   font-size: 12.5px;
+  line-height: 1.1;
 }
 
 .meta__obs-head {
@@ -418,6 +423,7 @@ function clearRows() {
   color: #0f172a;
   font-size: 12.5px;
   font-family: inherit;
+  line-height: 1.2;
 }
 
 @media (max-width: 1000px) {
@@ -526,9 +532,11 @@ function clearRows() {
   z-index: 1;
   background: #1e293b;
   color: #ffffff;
-  font-weight: 800;
+  font-weight: 900;
   text-align: center;
   font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .t__n {
