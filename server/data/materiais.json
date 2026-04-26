@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "codigo": "MAT-001",
+    "descricao": "Cimento CP II-E-32 50kg",
+    "unidade": "SC",
+    "quantidade": 120,
+    "localizacao": "Setor A - Prateleira 1"
+  },
+  {
+    "id": 2,
+    "codigo": "MAT-002",
+    "descricao": "Vergalhão CA-50 10mm 12m",
+    "unidade": "UN",
+    "quantidade": 340,
+    "localizacao": "Setor B - Cesto 2"
+  },
+  {
+    "id": 3,
+    "codigo": "MAT-003",
+    "descricao": "Tinta acrílica branco 18L",
+    "unidade": "Lata",
+    "quantidade": 15,
+    "localizacao": "Setor C - Prateleira 4"
+  },
+  {
+    "id": 4,
+    "codigo": "MAT-004",
+    "descricao": "Eletrodo E6013 2,5mm (kg)",
+    "unidade": "kg",
+    "quantidade": 8.5,
+    "localizacao": "Setor B - Cesto 1"
+  },
+  {
+    "id": 5,
+    "codigo": "MAT-005",
+    "descricao": "Tubo PVC soldável 1\" (3m)",
+    "unidade": "UN",
+    "quantidade": 42,
+    "localizacao": "Setor D - Corredor 2"
+  }
+]
