@@ -1,5 +1,5 @@
 <template>
-  <div class="doc">
+  <div class="doc" :class="{ 'doc--blank': isBlank }">
     <header class="doc__top">
       <div class="doc__brand">
         <div class="doc__logos" aria-label="Logos">
@@ -136,7 +136,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(r, i) in rows" :key="r.id">
+            <tr v-for="(r, i) in printRows" :key="r.id">
               <td class="t__n">{{ i + 1 }}</td>
               <td><input v-model="r.codigo" class="t__i t__i--mono" type="text" /></td>
               <td><input v-model="r.descricao" class="t__i" type="text" /></td>
@@ -151,7 +151,7 @@
                 <button type="button" class="t__del" title="Remover linha" @click="removeRow(r.id)">×</button>
               </td>
             </tr>
-            <tr v-if="rows.length === 0">
+            <tr v-if="rows.length === 0 && !isBlank">
               <td class="t__empty" colspan="11">Clique em “Adicionar linha” para começar.</td>
             </tr>
           </tbody>
@@ -177,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const meta = ref({
   contratada: "",
@@ -202,6 +202,39 @@ const meta = ref({
 });
 
 const rows = ref([]);
+
+const isBlank = computed(() => {
+  const m = meta.value || {};
+  const hasMeta = Object.values(m).some((v) => String(v || "").trim());
+  const hasRows = rows.value.some((r) => {
+    const { id, ...rest } = r || {};
+    return Object.values(rest).some((v) => String(v || "").trim());
+  });
+  return !hasMeta && !hasRows;
+});
+
+function blankRow() {
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    codigo: "",
+    descricao: "",
+    umb: "",
+    qtdSolic: "",
+    qtdExp: "",
+    qtdBaix: "",
+    qtdDev: "",
+    serial: "",
+    sap: ""
+  };
+}
+
+const printRows = computed(() => {
+  // Se estiver totalmente em branco, gera linhas extras para preenchimento manual no papel.
+  if (isBlank.value) {
+    return Array.from({ length: 22 }, () => blankRow());
+  }
+  return rows.value;
+});
 
 function addRow() {
   rows.value.push({
@@ -569,6 +602,59 @@ function clearRows() {
   .doc__grid { grid-template-columns: 1fr; }
   .f--span2 { grid-column: span 1; }
   .doc__footer { grid-template-columns: 1fr; }
+}
+
+@media print {
+  /* Deixa aparência de formulário em branco */
+  .doc__btn,
+  .t__del,
+  .t__empty {
+    display: none !important;
+  }
+
+  .doc,
+  .meta,
+  .doc__wrap {
+    border-color: #111827 !important;
+  }
+
+  .meta__cell,
+  .t th,
+  .t td {
+    border-color: #111827 !important;
+  }
+
+  .meta__i,
+  .meta__ta,
+  .t__i {
+    border-color: #111827 !important;
+    background: transparent !important;
+    color: #111827 !important;
+  }
+
+  /* Visual de “linha” para escrever */
+  .meta__i,
+  .t__i {
+    border-width: 0 0 1px 0 !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .meta__ta {
+    border-width: 1px !important;
+    border-radius: 0 !important;
+  }
+
+  .t th {
+    position: static !important;
+  }
+
+  /* Mantém cabeçalho e caixas sem sombras */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
 }
 </style>
 
