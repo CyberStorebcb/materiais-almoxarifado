@@ -41,6 +41,41 @@
             <div class="order__static">{{ infoGeral.ods || "" }}</div>
           </div>
         </div>
+
+        <div class="order__actions">
+          <button type="button" class="order__btn" :disabled="!String(infoGeral.pep || '').trim()" @click="registrar()">
+            Registrar
+          </button>
+        </div>
+      </section>
+
+      <section v-if="registros.length" class="reg" aria-label="Registros">
+        <div class="reg__header">
+          <h3 class="reg__title">REGISTROS</h3>
+          <button type="button" class="reg__clear" @click="limparRegistros">Limpar</button>
+        </div>
+        <div class="reg__table-wrap" role="region" aria-label="Tabela de registros">
+          <table class="reg__table">
+            <thead>
+              <tr>
+                <th>PEP</th>
+                <th>NOTA</th>
+                <th>ODI</th>
+                <th>ODM</th>
+                <th>ODS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="r in registros" :key="r.id">
+                <td class="reg__pep">{{ r.pep }}</td>
+                <td>{{ r.nota }}</td>
+                <td>{{ r.odi }}</td>
+                <td>{{ r.odm }}</td>
+                <td>{{ r.ods }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <header class="list__header">
@@ -149,6 +184,8 @@ const loading = ref(true);
 const erro = ref("");
 const q = ref("");
 const ocultarCodigos = ref(false);
+const REG_KEY = "materiais.registros.v1";
+const registros = ref([]);
 const infoGeral = ref({
   pep: "",
   nota: "",
@@ -199,6 +236,34 @@ async function carregarMateriaisPorPep(pep) {
   }
 }
 
+function registrar() {
+  const pep = String(infoGeral.value.pep || "").trim();
+  if (!pep) return;
+  const row = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    pep,
+    nota: String(infoGeral.value.nota || "").trim(),
+    odi: String(infoGeral.value.odi || "").trim(),
+    odm: String(infoGeral.value.odm || "").trim(),
+    ods: String(infoGeral.value.ods || "").trim()
+  };
+  registros.value = [row, ...registros.value];
+  try {
+    localStorage.setItem(REG_KEY, JSON.stringify(registros.value));
+  } catch {
+    /* ignore */
+  }
+}
+
+function limparRegistros() {
+  registros.value = [];
+  try {
+    localStorage.removeItem(REG_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 const itensFiltrados = computed(() => {
   const query = q.value.trim().toLowerCase();
   const pep = String(infoGeral.value.pep || "").trim().toLowerCase();
@@ -217,6 +282,12 @@ const itensFiltrados = computed(() => {
 onMounted(async () => {
   // Não carregar dados de demonstração automaticamente.
   // A lista deve ser preenchida apenas após digitar um PEP válido.
+  try {
+    const raw = localStorage.getItem(REG_KEY);
+    if (raw) registros.value = JSON.parse(raw);
+  } catch {
+    registros.value = [];
+  }
   loading.value = false;
 });
 
@@ -365,6 +436,130 @@ watch(
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.9rem;
+}
+
+.order__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.85rem;
+}
+
+.order__btn {
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 160ms var(--ease-out, ease), transform 160ms var(--ease-out, ease), box-shadow 160ms var(--ease-out, ease);
+}
+
+.order__btn:hover {
+  background: var(--btn-bg-hover);
+}
+
+.order__btn:active {
+  transform: translateY(1px);
+}
+
+.order__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.order__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring-soft);
+}
+
+.reg {
+  margin-top: 0.25rem;
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.reg__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.reg__title {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.reg__clear {
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--btn-border);
+  background: rgba(71, 85, 105, 0.12);
+  color: var(--btn-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 160ms var(--ease-out, ease), transform 160ms var(--ease-out, ease), box-shadow 160ms var(--ease-out, ease);
+}
+
+.reg__clear:hover {
+  background: rgba(71, 85, 105, 0.24);
+}
+
+.reg__clear:active {
+  transform: translateY(1px);
+}
+
+.reg__clear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring-soft);
+}
+
+.reg__table-wrap {
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.reg__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.reg__table th,
+.reg__table td {
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.reg__table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.reg__table tr:last-child td {
+  border-bottom: none;
+}
+
+.reg__pep {
+  font-family: ui-monospace, monospace;
 }
 
 .order__field {
