@@ -529,13 +529,51 @@ async function enviarRegistrosOutlook() {
   const emlUrl = URL.createObjectURL(emlBlob);
   const emlFilename = `BAIXAR-OBRAS-${new Date().toISOString().slice(0, 10)}.eml`;
 
-  // Se o popup foi permitido, direciona ele para o .eml
+  // Navegador não renderiza .eml (fica branco). Então abrimos uma página helper com link.
+  const helperHtml = `
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Enviar e-mail (Outlook)</title>
+  </head>
+  <body style="font-family:Segoe UI,Arial,sans-serif;background:#0b1220;color:#e5e7eb;margin:0;padding:24px;">
+    <div style="max-width:840px;margin:0 auto;background:#111827;border:1px solid rgba(148,163,184,.22);border-radius:14px;padding:18px 18px 14px;">
+      <h1 style="margin:0 0 6px 0;font-size:16px;">E-mail pronto para o Outlook</h1>
+      <p style="margin:0 0 12px 0;color:rgba(148,163,184,.95);font-size:13px;line-height:1.45;">
+        O arquivo <b>.eml</b> contém a <b>tabela formatada</b> e o <b>PDF anexado</b>.
+        Se não abrir automaticamente, clique no botão abaixo e depois abra no Outlook.
+      </p>
+      <a id="dl" href="${emlUrl}" download="${emlFilename}"
+         style="display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid rgba(148,163,184,.25);background:rgba(96,165,250,.12);color:#e5e7eb;text-decoration:none;font-weight:700;">
+        Baixar / Abrir no Outlook
+      </a>
+      <p style="margin:12px 0 0 0;color:rgba(148,163,184,.9);font-size:12px;">
+        Dica: no Chrome/Edge, marque “Sempre abrir arquivos deste tipo” para abrir automático no Outlook.
+      </p>
+    </div>
+    <script>
+      // Tenta iniciar o download automaticamente
+      setTimeout(() => {
+        const a = document.getElementById('dl');
+        if (a) a.click();
+      }, 50);
+    <\/script>
+  </body>
+</html>
+  `.trim();
+  const helperUrl = URL.createObjectURL(new Blob([helperHtml], { type: "text/html" }));
+
   if (popup) {
     try {
-      popup.location.href = emlUrl;
+      popup.location.href = helperUrl;
     } catch {
       /* ignore */
     }
+  } else {
+    // Sem popup: abre a página helper na mesma aba
+    window.location.href = helperUrl;
   }
 
   // Também baixa para o usuário ter acesso ao arquivo local
@@ -547,7 +585,10 @@ async function enviarRegistrosOutlook() {
   document.body.removeChild(dlA);
 
   // Revoga depois de um tempo, para dar chance da aba consumir o blob
-  setTimeout(() => URL.revokeObjectURL(emlUrl), 60_000);
+  setTimeout(() => {
+    URL.revokeObjectURL(emlUrl);
+    URL.revokeObjectURL(helperUrl);
+  }, 60_000);
 }
 
 async function copiarRegistrosEmail() {
