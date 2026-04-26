@@ -2,9 +2,13 @@
   <div class="doc">
     <header class="doc__top">
       <div class="doc__brand">
-        <div class="doc__logos" aria-hidden="true">
-          <div class="doc__logo doc__logo--a">equatorial</div>
-          <div class="doc__logo doc__logo--b">CGB</div>
+        <div class="doc__logos" aria-label="Logos">
+          <div class="doc__logo">
+            <img class="doc__logo-img doc__logo-img--eq" src="/templates/logo-equatorial.png" alt="Equatorial Energia" />
+          </div>
+          <div class="doc__logo">
+            <img class="doc__logo-img doc__logo-img--cgb" src="/templates/logo-cgb.png" alt="CGB" />
+          </div>
         </div>
       </div>
 
@@ -264,16 +268,24 @@ function clearRows() {
 }
 
 .doc__logo {
-  border: 1px solid rgba(203, 213, 225, 0.95);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  font-size: 13px;
-  text-transform: uppercase;
-  color: #111827;
-  background: #f8fafc;
+  border: 1px solid rgba(17, 24, 39, 0.55);
+  border-radius: 2px;
+  padding: 6px 8px;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  height: 46px;
 }
+
+.doc__logo-img {
+  display: block;
+  max-width: 100%;
+  max-height: 34px;
+  object-fit: contain;
+}
+
+.doc__logo-img--eq { max-height: 30px; }
+.doc__logo-img--cgb { max-height: 34px; }
 
 .doc__title {
   display: grid;
@@ -302,8 +314,8 @@ function clearRows() {
 .meta {
   display: grid;
   gap: 0;
-  border: 1px solid rgba(203, 213, 225, 0.95);
-  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.55);
+  border-radius: 2px;
   overflow: hidden;
 }
 
@@ -327,9 +339,9 @@ function clearRows() {
 }
 
 .meta__cell {
-  border-right: 1px solid rgba(203, 213, 225, 0.95);
-  border-bottom: 1px solid rgba(203, 213, 225, 0.95);
-  padding: 8px 10px;
+  border-right: 1px solid rgba(17, 24, 39, 0.55);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.55);
+  padding: 6px 8px;
   min-width: 0;
 }
 
@@ -339,18 +351,18 @@ function clearRows() {
 
 .meta__l {
   display: block;
-  font-size: 11px;
-  font-weight: 800;
-  color: #334155;
-  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
 }
 
 .meta__i {
   width: 100%;
   min-width: 0;
-  padding: 8px 9px;
-  border-radius: 10px;
-  border: 1px solid rgba(203, 213, 225, 0.95);
+  padding: 6px 7px;
+  border-radius: 2px;
+  border: 1px solid rgba(17, 24, 39, 0.35);
   background: #ffffff;
   color: #0f172a;
   font-size: 12px;
@@ -368,9 +380,11 @@ function clearRows() {
   width: 100%;
   min-height: 100%;
   resize: vertical;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(203, 213, 225, 0.95);
+  padding: 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(17, 24, 39, 0.35);
+  background: #ffffff;
+  color: #0f172a;
   font-size: 12px;
   font-family: inherit;
 }
