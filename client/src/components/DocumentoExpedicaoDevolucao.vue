@@ -245,8 +245,9 @@ function clearRows() {
 }
 
 .doc__logos {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .doc__logo {
@@ -257,6 +258,7 @@ function clearRows() {
   display: grid;
   place-items: center;
   height: 46px;
+  width: 150px;
 }
 
 .doc__logo-img {
