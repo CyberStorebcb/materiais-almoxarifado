@@ -255,6 +255,53 @@ async function ensureDropboxSharedLinkCache({ token, url, ttlMs }) {
   return g.__dropboxSharedExcelCache;
 }
 
+function toDirectDownloadUrl(url) {
+  const u = new URL(url);
+  // Dropbox shared link: ensure dl=1 for direct download.
+  u.searchParams.set("dl", "1");
+  return u.toString();
+}
+
+async function ensureDirectLinkCache({ url, ttlMs }) {
+  const g = globalThis;
+  if (!g.__directExcelCache) {
+    g.__directExcelCache = {
+      checkedAtMs: 0,
+      etag: "",
+      lastModified: "",
+      rows: [],
+      byPep3: new Map()
+    };
+  }
+  const cache = g.__directExcelCache;
+  const now = Date.now();
+  if (cache.rows.length && now - cache.checkedAtMs < ttlMs) return cache;
+
+  const directUrl = toDirectDownloadUrl(url);
+  const r = await fetch(directUrl, { method: "GET", redirect: "follow" });
+  if (!r.ok) throw new Error(`Download direto do Dropbox falhou (${r.status})`);
+
+  const etag = r.headers.get("etag") || "";
+  const lastModified = r.headers.get("last-modified") || "";
+
+  // Se o servidor fornecer ETag/Last-Modified e não mudou, só renova o TTL.
+  if (cache.rows.length && ((etag && etag === cache.etag) || (lastModified && lastModified === cache.lastModified))) {
+    cache.checkedAtMs = now;
+    return cache;
+  }
+
+  const ab = await r.arrayBuffer();
+  const buf = Buffer.from(ab);
+  const parsed = parseCN52NFromBuffer(buf);
+  g.__directExcelCache = {
+    checkedAtMs: now,
+    etag: etag || cache.etag,
+    lastModified: lastModified || cache.lastModified,
+    ...parsed
+  };
+  return g.__directExcelCache;
+}
+
 export default async function handler(req, res) {
   try {
     const pep = norm(req.query?.pep || "");
@@ -272,10 +319,14 @@ export default async function handler(req, res) {
     const dropboxToken = process.env.DROPBOX_ACCESS_TOKEN;
     const dropboxPath = process.env.DROPBOX_FILE_PATH;
     const dropboxSharedLink = process.env.DROPBOX_SHARED_LINK;
+    const dropboxDirectLink = process.env.DROPBOX_SHARED_LINK_DIRECT;
     const ttlMs = Number(process.env.DROPBOX_TTL_MS || 60_000);
 
     let rows = [];
-    if (dropboxToken && dropboxSharedLink) {
+    if (dropboxDirectLink) {
+      const cache = await ensureDirectLinkCache({ url: dropboxDirectLink, ttlMs });
+      rows = cache.byPep3.get(pep3) || [];
+    } else if (dropboxToken && dropboxSharedLink) {
       const cache = await ensureDropboxSharedLinkCache({ token: dropboxToken, url: dropboxSharedLink, ttlMs });
       rows = cache.byPep3.get(pep3) || [];
     } else if (dropboxToken && dropboxPath) {
