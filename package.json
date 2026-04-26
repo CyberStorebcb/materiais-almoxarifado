@@ -8,6 +8,9 @@
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server"
   },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
   "devDependencies": {
     "concurrently": "^9.2.1"
   }
