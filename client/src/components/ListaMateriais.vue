@@ -370,15 +370,19 @@ function buildEmailMeta() {
   return { subject, body };
 }
 
-function downloadBlob(blob, filename) {
+function downloadBlob(blob, filename, opts = {}) {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  const revokeAfterMs = Number(opts?.revokeAfterMs ?? 30_000);
+
+  // Download
+  const dlA = document.createElement("a");
+  dlA.href = url;
+  dlA.download = filename;
+  document.body.appendChild(dlA);
+  dlA.click();
+  document.body.removeChild(dlA);
+
+  setTimeout(() => URL.revokeObjectURL(url), revokeAfterMs);
 }
 
 async function blobToBase64Lines(blob, lineLen = 76) {
@@ -488,6 +492,14 @@ async function gerarRegistrosPdfBlob() {
 async function enviarRegistrosOutlook() {
   // OBS: deeplink do Outlook preenche body como texto puro (não vira tabela).
   // Para ter tabela formatada + PDF anexado, geramos um .eml (Outlook abre pronto).
+  // Para abrir automaticamente em nova aba, precisamos abrir o popup SINCRONO no clique do usuário.
+  let popup = null;
+  try {
+    popup = window.open("about:blank", "_blank", "noopener,noreferrer");
+  } catch {
+    popup = null;
+  }
+
   const { subject } = buildEmailMeta();
   const { blob: pdfBlob, filename: pdfName } = await gerarRegistrosPdfBlob();
 
@@ -514,7 +526,28 @@ async function enviarRegistrosOutlook() {
   });
 
   const emlBlob = new Blob([emlText], { type: "message/rfc822" });
-  downloadBlob(emlBlob, `BAIXAR-OBRAS-${new Date().toISOString().slice(0, 10)}.eml`);
+  const emlUrl = URL.createObjectURL(emlBlob);
+  const emlFilename = `BAIXAR-OBRAS-${new Date().toISOString().slice(0, 10)}.eml`;
+
+  // Se o popup foi permitido, direciona ele para o .eml
+  if (popup) {
+    try {
+      popup.location.href = emlUrl;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // Também baixa para o usuário ter acesso ao arquivo local
+  const dlA = document.createElement("a");
+  dlA.href = emlUrl;
+  dlA.download = emlFilename;
+  document.body.appendChild(dlA);
+  dlA.click();
+  document.body.removeChild(dlA);
+
+  // Revoga depois de um tempo, para dar chance da aba consumir o blob
+  setTimeout(() => URL.revokeObjectURL(emlUrl), 60_000);
 }
 
 async function copiarRegistrosEmail() {
