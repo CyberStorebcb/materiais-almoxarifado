@@ -21,7 +21,9 @@
             <button class="chip chip--sm" type="button" @click="irParaMateriais()">Voltar</button>
           </div>
         </header>
-        <DocumentoExpedicaoDevolucao />
+        <div class="panel__body panel__body--scroll">
+          <DocumentoExpedicaoDevolucao />
+        </div>
       </section>
     </main>
 
@@ -287,7 +289,18 @@ const gridClass = computed(() => {
 }
 
 .panel--docpage {
-  /* Esta página pode ser mais alta que o viewport */
+  /* Mantém header visível e scroll no corpo */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.panel__body--scroll {
   overflow: auto;
 }
 
