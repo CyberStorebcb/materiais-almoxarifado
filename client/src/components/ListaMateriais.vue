@@ -326,16 +326,58 @@ async function baixarRegistrosPdf() {
   const autoTable = autoTableMod.default || autoTableMod;
 
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-  doc.setFontSize(14);
-  doc.text("Registros de Materiais", 40, 40);
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 40;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("pt-BR");
+  const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  // Header
+  doc.setTextColor(17, 24, 39); // slate-900
+  doc.setFontSize(16);
+  doc.text("Registros de Materiais", marginX, 44);
+  doc.setFontSize(10);
+  doc.setTextColor(75, 85, 99); // slate-600
+  doc.text(`${dateStr} ${timeStr}`, pageW - marginX, 44, { align: "right" });
 
   autoTable(doc, {
     head: [["PEP", "NOTA", "ODI", "ODM", "ODS"]],
     body: rows,
-    startY: 60,
-    styles: { fontSize: 9, cellPadding: 6 },
-    headStyles: { fillColor: [13, 17, 23], textColor: 230 },
-    alternateRowStyles: { fillColor: [22, 27, 34] }
+    startY: 66,
+    margin: { left: marginX, right: marginX },
+    tableWidth: "auto",
+    styles: {
+      fontSize: 10.5,
+      cellPadding: { top: 7, right: 8, bottom: 7, left: 8 },
+      textColor: [17, 24, 39],
+      lineColor: [226, 232, 240], // slate-200
+      lineWidth: 0.6,
+      valign: "middle",
+      halign: "center"
+    },
+    headStyles: {
+      fillColor: [30, 41, 59], // slate-800
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "center",
+      lineColor: [30, 41, 59]
+    },
+    bodyStyles: { fillColor: [255, 255, 255] },
+    alternateRowStyles: { fillColor: [248, 250, 252] }, // slate-50
+    columnStyles: {
+      0: { cellWidth: 320, fontStyle: "bold", halign: "center" }, // PEP
+      1: { cellWidth: 120, halign: "center" }, // NOTA
+      2: { cellWidth: 120, halign: "center" }, // ODI
+      3: { cellWidth: 120, halign: "center" }, // ODM
+      4: { cellWidth: 120, halign: "center" } // ODS
+    },
+    didDrawPage: () => {
+      // Footer
+      const pageH = doc.internal.pageSize.getHeight();
+      doc.setFontSize(9);
+      doc.setTextColor(107, 114, 128); // gray-500
+      doc.text(`Total de linhas: ${rows.length}`, marginX, pageH - 24);
+    }
   });
 
   doc.save(`registros-${new Date().toISOString().slice(0, 10)}.pdf`);
