@@ -495,7 +495,8 @@ async function enviarRegistrosOutlook() {
   // Para abrir automaticamente em nova aba, precisamos abrir o popup SINCRONO no clique do usuário.
   let popup = null;
   try {
-    popup = window.open("about:blank", "_blank", "noopener,noreferrer");
+    // Não usar noopener aqui, senão alguns browsers não permitem escrever/navegar na aba aberta.
+    popup = window.open("about:blank", "_blank");
   } catch {
     popup = null;
   }
@@ -563,17 +564,20 @@ async function enviarRegistrosOutlook() {
   </body>
 </html>
   `.trim();
-  const helperUrl = URL.createObjectURL(new Blob([helperHtml], { type: "text/html" }));
 
   if (popup) {
     try {
-      popup.location.href = helperUrl;
+      popup.document.open();
+      popup.document.write(helperHtml);
+      popup.document.close();
     } catch {
       /* ignore */
     }
   } else {
     // Sem popup: abre a página helper na mesma aba
+    const helperUrl = URL.createObjectURL(new Blob([helperHtml], { type: "text/html" }));
     window.location.href = helperUrl;
+    setTimeout(() => URL.revokeObjectURL(helperUrl), 60_000);
   }
 
   // Também baixa para o usuário ter acesso ao arquivo local
@@ -587,7 +591,6 @@ async function enviarRegistrosOutlook() {
   // Revoga depois de um tempo, para dar chance da aba consumir o blob
   setTimeout(() => {
     URL.revokeObjectURL(emlUrl);
-    URL.revokeObjectURL(helperUrl);
   }, 60_000);
 }
 
