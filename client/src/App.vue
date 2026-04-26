@@ -360,6 +360,11 @@ const gridClass = computed(() => {
 }
 
 @media print {
+  :global(html, body) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .app__header,
   .app__actions,
   .panel__header,
@@ -390,7 +395,7 @@ const gridClass = computed(() => {
 
 :global(@page) {
   size: A4;
-  margin: 10mm;
+  margin: 5mm;
 }
 
 .panel__header {
