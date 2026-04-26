@@ -7,13 +7,25 @@
           <p>Documentos (PDF e CAD) e inventário de materiais</p>
         </div>
         <nav class="app__actions" aria-label="Navegação rápida">
-          <button class="chip" type="button" @click="scrollTo('docs')">Documentos</button>
-          <button class="chip" type="button" @click="scrollTo('materiais')">Materiais</button>
+          <button class="chip" type="button" @click="irParaDocumentos()">Documentos</button>
+          <button class="chip" type="button" @click="irParaMateriais()">Materiais</button>
         </nav>
       </div>
     </header>
 
-    <main class="app__grid" :class="gridClass" aria-label="Conteúdo principal">
+    <main v-if="activePage === 'doc'" class="app__docpage" aria-label="Documento web">
+      <section class="panel panel--docpage" aria-label="DOC. EXPEDIÇÃO E DEVOLUÇÃO">
+        <header class="panel__header">
+          <h2>DOC. EXPEDIÇÃO E DEVOLUÇÃO</h2>
+          <div class="panel__tools">
+            <button class="chip chip--sm" type="button" @click="irParaMateriais()">Voltar</button>
+          </div>
+        </header>
+        <DocumentoExpedicaoDevolucao />
+      </section>
+    </main>
+
+    <main v-else class="app__grid" :class="gridClass" aria-label="Conteúdo principal">
       <section
         v-if="previewMode !== 'hidden'"
         ref="docsEl"
@@ -76,14 +88,31 @@
 import { computed, ref } from "vue";
 import FilePreviewPanel from "./components/FilePreviewPanel.vue";
 import ListaMateriais from "./components/ListaMateriais.vue";
+import DocumentoExpedicaoDevolucao from "./components/DocumentoExpedicaoDevolucao.vue";
 
 const docsEl = ref(null);
 const materiaisEl = ref(null);
 const previewMode = ref("full"); // 'full' | 'compact' | 'hidden'
+const activePage = ref("home"); // 'home' | 'doc'
 
 function scrollTo(where) {
   const el = where === "docs" ? docsEl.value : materiaisEl.value;
   el?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+}
+
+function irParaDocumentos() {
+  activePage.value = "doc";
+  try {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch {
+    /* ignore */
+  }
+}
+
+function irParaMateriais() {
+  activePage.value = "home";
+  // garante que o painel exista antes de tentar scroll
+  requestAnimationFrame(() => scrollTo("materiais"));
 }
 
 function togglePreview() {
@@ -210,6 +239,17 @@ const gridClass = computed(() => {
   width: 100%;
   overflow: auto;
   transition: grid-template-columns 220ms var(--ease-out, ease);
+}
+
+.app__docpage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  padding: clamp(0.9rem, 2vw, 1.6rem);
+  width: 100%;
+  overflow: auto;
 }
 
 .app__grid--compact {
