@@ -63,6 +63,7 @@
                 <th>ODI</th>
                 <th>ODM</th>
                 <th>ODS</th>
+                <th class="reg__th-actions" aria-label="Ações"></th>
               </tr>
             </thead>
             <tbody>
@@ -72,6 +73,22 @@
                 <td>{{ r.odi }}</td>
                 <td>{{ r.odm }}</td>
                 <td>{{ r.ods }}</td>
+                <td class="reg__actions">
+                  <button type="button" class="reg__delete" title="Apagar linha" @click="removerRegistro(r.id)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6V4h8v2" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 6l-1 14H6L5 6"
+                      />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11v6" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11v6" />
+                    </svg>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -259,6 +276,15 @@ function limparRegistros() {
   registros.value = [];
   try {
     localStorage.removeItem(REG_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function removerRegistro(id) {
+  registros.value = registros.value.filter((r) => r.id !== id);
+  try {
+    localStorage.setItem(REG_KEY, JSON.stringify(registros.value));
   } catch {
     /* ignore */
   }
@@ -541,6 +567,47 @@ watch(
   border-bottom: 1px solid var(--border);
   text-align: left;
   white-space: nowrap;
+}
+
+.reg__th-actions {
+  width: 44px;
+}
+
+.reg__actions {
+  text-align: right;
+}
+
+.reg__delete {
+  width: 30px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--btn-border);
+  background: rgba(248, 113, 133, 0.10);
+  color: rgba(248, 113, 133, 0.95);
+  cursor: pointer;
+  padding: 0;
+  transition: background 160ms var(--ease-out, ease), transform 160ms var(--ease-out, ease), box-shadow 160ms var(--ease-out, ease);
+}
+
+.reg__delete:hover {
+  background: rgba(248, 113, 133, 0.18);
+}
+
+.reg__delete:active {
+  transform: translateY(1px);
+}
+
+.reg__delete:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring-soft);
+}
+
+.reg__delete svg {
+  width: 14px;
+  height: 14px;
 }
 
 .reg__table th {
