@@ -52,7 +52,11 @@
       <section v-if="registros.length" class="reg" aria-label="Registros">
         <div class="reg__header">
           <h3 class="reg__title">REGISTROS</h3>
-          <button type="button" class="reg__clear" @click="limparRegistros">Limpar</button>
+          <div class="reg__tools">
+            <button type="button" class="reg__tool" @click="copiarRegistrosEmail">Copiar</button>
+            <button type="button" class="reg__tool" @click="baixarRegistrosPdf">Baixar PDF</button>
+            <button type="button" class="reg__clear" @click="limparRegistros">Limpar</button>
+          </div>
         </div>
         <div class="reg__table-wrap" role="region" aria-label="Tabela de registros">
           <table class="reg__table">
@@ -290,6 +294,53 @@ function removerRegistro(id) {
   }
 }
 
+function registrosToTsv() {
+  const head = ["PEP", "NOTA", "ODI", "ODM", "ODS"].join("\t");
+  const lines = registros.value.map((r) => [r.pep, r.nota, r.odi, r.odm, r.ods].join("\t"));
+  return [head, ...lines].join("\n");
+}
+
+async function copiarRegistrosEmail() {
+  const text = registrosToTsv();
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Fallback para ambientes sem clipboard permissions.
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    ta.setAttribute("readonly", "true");
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  }
+}
+
+async function baixarRegistrosPdf() {
+  const rows = registros.value.map((r) => [r.pep, r.nota, r.odi, r.odm, r.ods]);
+
+  // Dynamic import para não pesar o bundle inicial
+  const [{ jsPDF }, autoTableMod] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
+  const autoTable = autoTableMod.default || autoTableMod;
+
+  const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+  doc.setFontSize(14);
+  doc.text("Registros de Materiais", 40, 40);
+
+  autoTable(doc, {
+    head: [["PEP", "NOTA", "ODI", "ODM", "ODS"]],
+    body: rows,
+    startY: 60,
+    styles: { fontSize: 9, cellPadding: 6 },
+    headStyles: { fillColor: [13, 17, 23], textColor: 230 },
+    alternateRowStyles: { fillColor: [22, 27, 34] }
+  });
+
+  doc.save(`registros-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
 const itensFiltrados = computed(() => {
   const query = q.value.trim().toLowerCase();
   const pep = String(infoGeral.value.pep || "").trim().toLowerCase();
@@ -516,6 +567,14 @@ watch(
   margin-bottom: 0.75rem;
 }
 
+.reg__tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+
 .reg__title {
   margin: 0;
   letter-spacing: 0.08em;
@@ -523,6 +582,30 @@ watch(
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.reg__tool {
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--btn-border);
+  background: rgba(71, 85, 105, 0.12);
+  color: var(--btn-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 160ms var(--ease-out, ease), transform 160ms var(--ease-out, ease), box-shadow 160ms var(--ease-out, ease);
+}
+
+.reg__tool:hover {
+  background: rgba(71, 85, 105, 0.24);
+}
+
+.reg__tool:active {
+  transform: translateY(1px);
+}
+
+.reg__tool:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring-soft);
 }
 
 .reg__clear {
