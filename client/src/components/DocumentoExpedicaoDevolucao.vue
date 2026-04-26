@@ -20,110 +20,92 @@
 
     <section class="doc__meta" aria-label="Dados do documento">
       <div class="meta">
-        <div class="meta__row meta__row--head">
-          <div class="meta__cell meta__cell--l"></div>
-          <div class="meta__cell meta__cell--m"></div>
-          <div class="meta__cell meta__cell--r meta__obs-head">OBSERVAÇÃO</div>
-        </div>
+        <div class="meta__head meta__cell"></div>
+        <div class="meta__head meta__cell"></div>
+        <div class="meta__head meta__cell meta__obs-head">OBSERVAÇÃO</div>
 
-        <div class="meta__row">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__a">
             <span class="meta__l">Contratada (Operador logístico / executora serviço de obra):</span>
             <input v-model="meta.contratada" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__b">
             <span class="meta__l">Data procesamento da reserva:</span>
             <input v-model="meta.dataProcReserva" class="meta__i" type="date" />
-          </label>
-          <div class="meta__cell meta__cell--r meta__obs" :style="{ gridRow: 'span 6' }">
-            <textarea v-model="meta.observacao" class="meta__ta" rows="9"></textarea>
-          </div>
+        </label>
+        <div class="meta__cell meta__obs">
+          <textarea v-model="meta.observacao" class="meta__ta" rows="9"></textarea>
         </div>
 
-        <div class="meta__row">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__c">
             <span class="meta__l">Município:</span>
             <input v-model="meta.municipio" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__d">
             <span class="meta__l">Horário procesamento da reserva:</span>
             <input v-model="meta.horaProcReserva" class="meta__i" type="time" />
-          </label>
-        </div>
+        </label>
 
-        <div class="meta__row">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__e">
             <span class="meta__l">Localidade aplicação dos materiais:</span>
             <input v-model="meta.localidadeAplicacao" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__f">
             <span class="meta__l">Data planejada para saque dos materiais:</span>
             <input v-model="meta.dataPlanejadaSaque" class="meta__i" type="date" />
-          </label>
-        </div>
+        </label>
 
-        <div class="meta__row">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__g">
             <span class="meta__l">Área / setor:</span>
             <input v-model="meta.areaSetor" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__h">
             <span class="meta__l">Horário planejado para saque dos materiais:</span>
             <input v-model="meta.horaPlanejadaSaque" class="meta__i" type="time" />
-          </label>
-        </div>
+        </label>
 
-        <div class="meta__row">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__i">
             <span class="meta__l">Depósito (viatura ou eletricista) / equipe de campo:</span>
             <input v-model="meta.depositoEquipe" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__j">
             <span class="meta__l">Placa do veículo:</span>
             <input v-model="meta.placaVeiculo" class="meta__i" type="text" />
-          </label>
-        </div>
+        </label>
 
-        <div class="meta__row">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__k">
             <span class="meta__l">Requisição:</span>
             <input v-model="meta.requisicao" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__l">
             <span class="meta__l">Data da requisição:</span>
             <input v-model="meta.dataRequisicao" class="meta__i" type="date" />
-          </label>
-        </div>
+        </label>
 
-        <div class="meta__row meta__row--bottom">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__m">
             <span class="meta__l">Solicitado por:</span>
             <input v-model="meta.solicitadoPor" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__n">
             <span class="meta__l">Número da ocorrência NR/INC:</span>
             <input v-model="meta.nrInc" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--r2">
+        </label>
+        <label class="meta__cell meta__o">
             <span class="meta__l">Número do componente:</span>
             <input v-model="meta.numeroComponente" class="meta__i" type="text" />
-          </label>
-        </div>
+        </label>
 
-        <div class="meta__row meta__row--bottom">
-          <label class="meta__cell meta__cell--l">
+        <label class="meta__cell meta__p">
             <span class="meta__l">Autorizado por:</span>
             <input v-model="meta.autorizadoPor" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--m">
+        </label>
+        <label class="meta__cell meta__q">
             <span class="meta__l">Número PEP da obra:</span>
             <input v-model="meta.pepObra" class="meta__i" type="text" />
-          </label>
-          <label class="meta__cell meta__cell--r2">
+        </label>
+        <label class="meta__cell meta__r">
             <span class="meta__l">Data da devolução:</span>
             <input v-model="meta.dataDevolucao" class="meta__i" type="date" />
-          </label>
-        </div>
+        </label>
       </div>
     </section>
 
@@ -317,15 +299,10 @@ function clearRows() {
   border: 1px solid rgba(17, 24, 39, 0.55);
   border-radius: 2px;
   overflow: hidden;
-}
-
-.meta__row {
-  display: grid;
   grid-template-columns: 1.05fr 0.9fr 0.95fr;
-  gap: 0;
 }
 
-.meta__row--head .meta__cell {
+.meta__head {
   background: #f8fafc;
   font-weight: 900;
   font-size: 11px;
@@ -345,7 +322,7 @@ function clearRows() {
   min-width: 0;
 }
 
-.meta__row .meta__cell:last-child {
+.meta > .meta__cell:nth-child(3n) {
   border-right: none;
 }
 
@@ -374,6 +351,8 @@ function clearRows() {
 
 .meta__obs {
   padding: 8px 10px;
+  grid-column: 3;
+  grid-row: 2 / span 5;
 }
 
 .meta__ta {
@@ -389,22 +368,32 @@ function clearRows() {
   font-family: inherit;
 }
 
-.meta__cell--r2 {
-  border-right: none;
+@media (max-width: 1000px) {
+  .meta { grid-template-columns: 1fr; }
+  .meta__head { justify-content: flex-start; padding-left: 10px; }
+  .meta > .meta__cell:nth-child(3n) { border-right: 1px solid rgba(17, 24, 39, 0.55); }
+  .meta__cell { border-right: none; }
+  .meta__obs { grid-column: auto; grid-row: auto; }
 }
 
-@media (max-width: 1000px) {
-  .meta__row {
-    grid-template-columns: 1fr;
-  }
-  .meta__row--head .meta__cell {
-    justify-content: flex-start;
-    padding-left: 10px;
-  }
-  .meta__cell {
-    border-right: none;
-  }
-}
+.meta__a { grid-column: 1; grid-row: 2; }
+.meta__b { grid-column: 2; grid-row: 2; }
+.meta__c { grid-column: 1; grid-row: 3; }
+.meta__d { grid-column: 2; grid-row: 3; }
+.meta__e { grid-column: 1; grid-row: 4; }
+.meta__f { grid-column: 2; grid-row: 4; }
+.meta__g { grid-column: 1; grid-row: 5; }
+.meta__h { grid-column: 2; grid-row: 5; }
+.meta__i { grid-column: 1; grid-row: 6; }
+.meta__j { grid-column: 2; grid-row: 6; }
+.meta__k { grid-column: 1; grid-row: 7; }
+.meta__l { grid-column: 2; grid-row: 7; }
+.meta__m { grid-column: 1; grid-row: 8; }
+.meta__n { grid-column: 2; grid-row: 8; }
+.meta__o { grid-column: 3; grid-row: 8; }
+.meta__p { grid-column: 1; grid-row: 9; }
+.meta__q { grid-column: 2; grid-row: 9; }
+.meta__r { grid-column: 3; grid-row: 9; }
 
 .doc__table {
   padding: 12px 14px 14px;
