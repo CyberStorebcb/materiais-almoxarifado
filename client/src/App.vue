@@ -442,15 +442,6 @@ const gridClass = computed(() => {
   }
 }
 
-/* Regras de página precisam ser globais para não serem "scoped" */
-:global(@page) {
-  /* Chrome/Edge: A4 landscape */
-  size: A4 landscape;
-  /* Fallback */
-  size: landscape;
-  margin: 5mm;
-}
-
 .panel__header {
   display: flex;
   align-items: baseline;
@@ -480,5 +471,15 @@ const gridClass = computed(() => {
   .app__grid { gap: var(--space-3); }
   .panel { padding: var(--space-3); }
   .app__actions { width: 100%; justify-content: start; }
+}
+</style>
+
+<style>
+/* Print rules precisam ser globais (fora do scoped) */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 5mm;
+  }
 }
 </style>
