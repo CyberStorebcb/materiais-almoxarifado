@@ -54,6 +54,7 @@
           <h3 class="reg__title">REGISTROS</h3>
           <div class="reg__tools">
             <button type="button" class="reg__tool" @click="copiarRegistrosEmail">Copiar</button>
+            <button type="button" class="reg__tool" @click="enviarRegistrosOutlook">Enviar e-mail</button>
             <button type="button" class="reg__tool" @click="baixarRegistrosPdf">Baixar PDF</button>
             <button type="button" class="reg__clear" @click="limparRegistros">Limpar</button>
           </div>
@@ -300,6 +301,222 @@ function registrosToTsv() {
   return [head, ...lines].join("\n");
 }
 
+function registrosToEmailBody() {
+  // Outlook costuma renderizar melhor com CRLF
+  return registrosToTsv().replaceAll("\n", "\r\n");
+}
+
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function registrosToHtmlTable() {
+  const head = ["PEP", "NOTA", "ODI", "ODM", "ODS"];
+  const rows = registros.value.map((r) => [r.pep, r.nota, r.odi, r.odm, r.ods]);
+
+  const th = head
+    .map(
+      (h) =>
+        `<th style="background:#1e293b;color:#ffffff;padding:8px 10px;border:1px solid #cbd5e1;text-align:center;font-weight:700;font-size:12px;">${escapeHtml(h)}</th>`
+    )
+    .join("");
+
+  const trs = rows
+    .map((row, idx) => {
+      const bg = idx % 2 ? "#f8fafc" : "#ffffff";
+      const tds = row
+        .map(
+          (c, colIdx) =>
+            `<td style="background:${bg};padding:8px 10px;border:1px solid #cbd5e1;text-align:center;font-size:12px;${colIdx === 0 ? "font-weight:700;" : ""}">${escapeHtml(
+              c
+            )}</td>`
+        )
+        .join("");
+      return `<tr>${tds}</tr>`;
+    })
+    .join("");
+
+  return `
+<table cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1px solid #cbd5e1;width:100%;max-width:980px;">
+  <thead><tr>${th}</tr></thead>
+  <tbody>${trs}</tbody>
+</table>`.trim();
+}
+
+function buildEmailMeta() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("pt-BR");
+  const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const pep = String(infoGeral.value.pep || "").trim();
+  const subject = "BAIXAR OBRAS";
+
+  // Extra: se tiver 1 registro, usar o PEP dele também (caso o usuário tenha limpado o campo).
+  const firstPep = String(registros.value?.[0]?.pep || "").trim();
+  const effectivePep = pep || firstPep;
+
+  const introLines = [
+    "Segue tabela para baixa de obras.",
+    effectivePep ? `PEP: ${effectivePep}` : "",
+    "",
+    "(PDF gerado no clique — anexar o arquivo baixado.)",
+    "",
+  ].filter(Boolean);
+  const body = `${introLines.join("\r\n")}${registrosToEmailBody() ? "\r\n" : ""}${registrosToEmailBody()}`;
+  return { subject, body };
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+async function blobToBase64Lines(blob, lineLen = 76) {
+  const buf = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  const b64 = btoa(binary);
+  const lines = [];
+  for (let i = 0; i < b64.length; i += lineLen) lines.push(b64.slice(i, i + lineLen));
+  return lines.join("\r\n");
+}
+
+function buildEml({ subject, htmlBody, attachmentBase64, attachmentFilename }) {
+  const boundary = `----=_materiais_${Math.random().toString(16).slice(2)}_${Date.now()}`;
+  const headers = [
+    `Subject: ${subject}`,
+    "MIME-Version: 1.0",
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    "",
+    `--${boundary}`,
+    'Content-Type: text/html; charset="utf-8"',
+    "Content-Transfer-Encoding: 7bit",
+    "",
+    htmlBody,
+    "",
+    `--${boundary}`,
+    `Content-Type: application/pdf; name="${attachmentFilename}"`,
+    "Content-Transfer-Encoding: base64",
+    `Content-Disposition: attachment; filename="${attachmentFilename}"`,
+    "",
+    attachmentBase64,
+    "",
+    `--${boundary}--`,
+    ""
+  ];
+  return headers.join("\r\n");
+}
+
+async function gerarRegistrosPdfBlob() {
+  const rows = registros.value.map((r) => [r.pep, r.nota, r.odi, r.odm, r.ods]);
+
+  const [{ jsPDF }, autoTableMod] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
+  const autoTable = autoTableMod.default || autoTableMod;
+
+  const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 40;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("pt-BR");
+  const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  doc.setTextColor(17, 24, 39);
+  doc.setFontSize(16);
+  doc.text("Registros de Materiais", pageW / 2, 44, { align: "center" });
+  doc.setFontSize(10);
+  doc.setTextColor(75, 85, 99);
+  doc.text(`${dateStr} ${timeStr}`, pageW - marginX, 44, { align: "right" });
+
+  autoTable(doc, {
+    head: [["PEP", "NOTA", "ODI", "ODM", "ODS"]],
+    body: rows,
+    startY: 66,
+    margin: { left: marginX, right: marginX },
+    tableWidth: "auto",
+    styles: {
+      fontSize: 10.5,
+      cellPadding: { top: 7, right: 8, bottom: 7, left: 8 },
+      textColor: [17, 24, 39],
+      lineColor: [226, 232, 240],
+      lineWidth: 0.6,
+      valign: "middle",
+      halign: "center"
+    },
+    headStyles: {
+      fillColor: [30, 41, 59],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "center",
+      lineColor: [30, 41, 59]
+    },
+    bodyStyles: { fillColor: [255, 255, 255] },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    columnStyles: {
+      0: { cellWidth: 320, fontStyle: "bold", halign: "center" },
+      1: { cellWidth: 120, halign: "center" },
+      2: { cellWidth: 120, halign: "center" },
+      3: { cellWidth: 120, halign: "center" },
+      4: { cellWidth: 120, halign: "center" }
+    },
+    didDrawPage: () => {
+      const pageH = doc.internal.pageSize.getHeight();
+      doc.setFontSize(9);
+      doc.setTextColor(107, 114, 128);
+      doc.text(`Total de linhas: ${rows.length}`, marginX, pageH - 24);
+    }
+  });
+
+  const filename = `registros-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const blob = doc.output("blob");
+  return { blob, filename };
+}
+
+async function enviarRegistrosOutlook() {
+  // OBS: deeplink do Outlook preenche body como texto puro (não vira tabela).
+  // Para ter tabela formatada + PDF anexado, geramos um .eml (Outlook abre pronto).
+  const { subject } = buildEmailMeta();
+  const { blob: pdfBlob, filename: pdfName } = await gerarRegistrosPdfBlob();
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("pt-BR");
+  const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const pep = String(infoGeral.value.pep || "").trim() || String(registros.value?.[0]?.pep || "").trim();
+
+  const html = `
+<div style="font-family:Segoe UI,Arial,sans-serif;font-size:13px;color:#0f172a;">
+  <p style="margin:0 0 10px 0;">Segue tabela para baixa de obras.</p>
+  ${pep ? `<p style="margin:0 0 10px 0;"><b>PEP:</b> ${escapeHtml(pep)}</p>` : ""}
+  <p style="margin:0 0 14px 0;color:#475569;font-size:12px;">Gerado em ${escapeHtml(dateStr)} ${escapeHtml(timeStr)}.</p>
+  ${registrosToHtmlTable()}
+  <p style="margin:14px 0 0 0;color:#475569;font-size:12px;">PDF anexado: ${escapeHtml(pdfName)}</p>
+</div>`.trim();
+
+  const pdfB64Lines = await blobToBase64Lines(pdfBlob);
+  const emlText = buildEml({
+    subject,
+    htmlBody: html,
+    attachmentBase64: pdfB64Lines,
+    attachmentFilename: pdfName
+  });
+
+  const emlBlob = new Blob([emlText], { type: "message/rfc822" });
+  downloadBlob(emlBlob, `BAIXAR-OBRAS-${new Date().toISOString().slice(0, 10)}.eml`);
+}
+
 async function copiarRegistrosEmail() {
   const text = registrosToTsv();
   try {
@@ -319,68 +536,8 @@ async function copiarRegistrosEmail() {
 }
 
 async function baixarRegistrosPdf() {
-  const rows = registros.value.map((r) => [r.pep, r.nota, r.odi, r.odm, r.ods]);
-
-  // Dynamic import para não pesar o bundle inicial
-  const [{ jsPDF }, autoTableMod] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
-  const autoTable = autoTableMod.default || autoTableMod;
-
-  const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-  const pageW = doc.internal.pageSize.getWidth();
-  const marginX = 40;
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("pt-BR");
-  const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-  // Header
-  doc.setTextColor(17, 24, 39); // slate-900
-  doc.setFontSize(16);
-  doc.text("Registros de Materiais", marginX, 44);
-  doc.setFontSize(10);
-  doc.setTextColor(75, 85, 99); // slate-600
-  doc.text(`${dateStr} ${timeStr}`, pageW - marginX, 44, { align: "right" });
-
-  autoTable(doc, {
-    head: [["PEP", "NOTA", "ODI", "ODM", "ODS"]],
-    body: rows,
-    startY: 66,
-    margin: { left: marginX, right: marginX },
-    tableWidth: "auto",
-    styles: {
-      fontSize: 10.5,
-      cellPadding: { top: 7, right: 8, bottom: 7, left: 8 },
-      textColor: [17, 24, 39],
-      lineColor: [226, 232, 240], // slate-200
-      lineWidth: 0.6,
-      valign: "middle",
-      halign: "center"
-    },
-    headStyles: {
-      fillColor: [30, 41, 59], // slate-800
-      textColor: [255, 255, 255],
-      fontStyle: "bold",
-      halign: "center",
-      lineColor: [30, 41, 59]
-    },
-    bodyStyles: { fillColor: [255, 255, 255] },
-    alternateRowStyles: { fillColor: [248, 250, 252] }, // slate-50
-    columnStyles: {
-      0: { cellWidth: 320, fontStyle: "bold", halign: "center" }, // PEP
-      1: { cellWidth: 120, halign: "center" }, // NOTA
-      2: { cellWidth: 120, halign: "center" }, // ODI
-      3: { cellWidth: 120, halign: "center" }, // ODM
-      4: { cellWidth: 120, halign: "center" } // ODS
-    },
-    didDrawPage: () => {
-      // Footer
-      const pageH = doc.internal.pageSize.getHeight();
-      doc.setFontSize(9);
-      doc.setTextColor(107, 114, 128); // gray-500
-      doc.text(`Total de linhas: ${rows.length}`, marginX, pageH - 24);
-    }
-  });
-
-  doc.save(`registros-${new Date().toISOString().slice(0, 10)}.pdf`);
+  const { blob, filename } = await gerarRegistrosPdfBlob();
+  downloadBlob(blob, filename);
 }
 
 const itensFiltrados = computed(() => {
