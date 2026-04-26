@@ -152,9 +152,9 @@ const ocultarCodigos = ref(false);
 const infoGeral = ref({
   pep: "",
   nota: "",
-  odi: "5200802",
-  odm: "5200804",
-  ods: "5200805"
+  odi: "",
+  odm: "",
+  ods: ""
 });
 
 function formatarQtd(n) {
