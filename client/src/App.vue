@@ -286,6 +286,11 @@ const gridClass = computed(() => {
   scroll-margin-top: 92px;
 }
 
+.panel--docpage {
+  /* Esta página pode ser mais alta que o viewport */
+  overflow: auto;
+}
+
 .panel__header {
   display: flex;
   align-items: baseline;
