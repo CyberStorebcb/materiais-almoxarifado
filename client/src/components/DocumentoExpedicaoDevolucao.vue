@@ -251,9 +251,8 @@ function clearRows() {
 }
 
 .doc__logo {
-  border: 1px solid rgba(17, 24, 39, 0.55);
   border-radius: 2px;
-  padding: 6px 8px;
+  padding: 1px 5px;
   background: #ffffff;
   display: grid;
   place-items: center;

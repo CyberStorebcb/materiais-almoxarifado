@@ -18,11 +18,15 @@
         <header class="panel__header">
           <h2>DOC. EXPEDIÇÃO E DEVOLUÇÃO</h2>
           <div class="panel__tools">
+            <button class="chip chip--sm" type="button" @click="imprimirDoc">Imprimir (A4)</button>
+            <button class="chip chip--sm" type="button" @click="baixarDocPdf">Gerar PDF (A4)</button>
             <button class="chip chip--sm" type="button" @click="irParaMateriais()">Voltar</button>
           </div>
         </header>
         <div class="panel__body panel__body--scroll">
-          <DocumentoExpedicaoDevolucao />
+          <div ref="docPrintEl" class="docprint">
+            <DocumentoExpedicaoDevolucao />
+          </div>
         </div>
       </section>
     </main>
@@ -87,13 +91,14 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import FilePreviewPanel from "./components/FilePreviewPanel.vue";
 import ListaMateriais from "./components/ListaMateriais.vue";
 import DocumentoExpedicaoDevolucao from "./components/DocumentoExpedicaoDevolucao.vue";
 
 const docsEl = ref(null);
 const materiaisEl = ref(null);
+const docPrintEl = ref(null);
 const previewMode = ref("full"); // 'full' | 'compact' | 'hidden'
 const activePage = ref("home"); // 'home' | 'doc'
 
@@ -115,6 +120,52 @@ function irParaMateriais() {
   activePage.value = "home";
   // garante que o painel exista antes de tentar scroll
   requestAnimationFrame(() => scrollTo("materiais"));
+}
+
+async function imprimirDoc() {
+  if (activePage.value !== "doc") return;
+  await nextTick();
+  window.print();
+}
+
+async function baixarDocPdf() {
+  if (activePage.value !== "doc") return;
+  await nextTick();
+  const el = docPrintEl.value;
+  if (!el) return;
+
+  const [{ jsPDF }, html2canvasMod] = await Promise.all([import("jspdf"), import("html2canvas")]);
+  const html2canvas = html2canvasMod.default || html2canvasMod;
+
+  const canvas = await html2canvas(el, {
+    scale: Math.min(2, window.devicePixelRatio || 1),
+    backgroundColor: "#ffffff",
+    useCORS: true
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  const pageW = 210;
+  const pageH = 297;
+  const margin = 10;
+  const usableW = pageW - margin * 2;
+  const imgH = (canvas.height * usableW) / canvas.width;
+
+  let y = margin;
+  let remaining = imgH;
+  const x = margin;
+
+  // Adiciona páginas fatiando verticalmente (via offset no addImage)
+  let pageIndex = 0;
+  while (remaining > 0) {
+    if (pageIndex > 0) pdf.addPage();
+    pdf.addImage(imgData, "PNG", x, y - pageIndex * pageH, usableW, imgH);
+    remaining -= pageH;
+    pageIndex += 1;
+  }
+
+  pdf.save(`DOC-EXPEDICAO-DEVOLUCAO-${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 function togglePreview() {
@@ -302,6 +353,44 @@ const gridClass = computed(() => {
 
 .panel__body--scroll {
   overflow: auto;
+}
+
+.docprint {
+  background: #ffffff;
+}
+
+@media print {
+  .app__header,
+  .app__actions,
+  .panel__header,
+  .panel__tools {
+    display: none !important;
+  }
+
+  .app,
+  .app__docpage,
+  .panel--docpage,
+  .panel__body--scroll {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .panel {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .docprint {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+:global(@page) {
+  size: A4;
+  margin: 10mm;
 }
 
 .panel__header {
