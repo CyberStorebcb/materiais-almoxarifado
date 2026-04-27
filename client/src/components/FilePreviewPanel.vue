@@ -8,53 +8,16 @@
       @change="onFile"
     />
 
-    <div class="docs__bar" aria-label="Modelos de documentos">
-      <button type="button" class="docs__bar-btn" :data-active="viewMode === 'file' ? '1' : '0'" @click="viewMode = 'file'">
-        Arquivo
-      </button>
-      <button
-        type="button"
-        class="docs__bar-btn"
-        :data-active="viewMode === 'modelo' ? '1' : '0'"
-        @click="ativarModelo()"
-      >
-        DOC. EXPEDIÇÃO E DEVOLUÇÃO
-      </button>
-    </div>
-
     <div
       class="docs__view docs__drop"
       :data-dragging="dragging ? '1' : '0'"
-      @click="viewMode === 'file' ? abrirFicheiro() : null"
+      @click="abrirFicheiro()"
       @dragover.prevent
       @drop.prevent="onDrop"
       @dragenter.prevent="onDragEnter"
       @dragleave.prevent="onDragLeave"
     >
       <p v-if="avisoDwg" class="docs__note" @click.stop>{{ avisoDwg }}</p>
-
-      <div
-        v-if="viewMode === 'modelo'"
-        class="docs__pdf-wrap docs__tpl-wrap"
-        :class="{ 'docs__pdf-wrap--zoomed': pdfZoom !== 1 }"
-        @click.stop
-        @wheel.capture="onPdfWheel"
-      >
-        <div
-          ref="pdfPanBox"
-          class="docs__pdf-pan"
-          :data-panning="pdfPanning ? '1' : '0'"
-          @pointerdown.capture="onPdfPointerDown"
-          @pointermove.capture="onPdfPointerMove"
-          @pointerup.capture="endPdfPan"
-          @pointercancel.capture="endPdfPan"
-          @pointerleave.capture="endPdfPan"
-        >
-          <div class="docs__pdf-scale" :style="pdfScaleStyle">
-            <img :src="modeloSrc" class="docs__tpl-img" alt="Modelo: DOC. EXPEDIÇÃO E DEVOLUÇÃO" />
-          </div>
-        </div>
-      </div>
 
       <div
         v-if="fontePdf"
@@ -94,7 +57,7 @@
 
       <div v-show="fonteDxf" ref="dxfBox" class="docs__dxf" aria-label="Pré-visualização DXF" @click.stop />
 
-      <div v-if="viewMode !== 'modelo' && !fontePdf && !fonteDxf && !avisoDwg" class="docs__empty" @click.stop>
+      <div v-if="!fontePdf && !fonteDxf && !avisoDwg" class="docs__empty" @click.stop>
         <span class="docs__empty-muted">Clique ou arraste um PDF ou DXF</span>
       </div>
 
@@ -116,8 +79,6 @@ const fontePdf = ref(null);
 const fonteDxf = ref(false);
 const avisoDwg = ref("");
 const dragging = ref(false);
-const viewMode = ref("file"); // file | modelo
-const modeloSrc = "/templates/doc-expedicao-devolucao.png";
 const pdfBaseHeight = ref(720);
 const pdfRenderScale = ref(1.25);
 const pdfZoom = ref(1);
@@ -186,20 +147,6 @@ function limparPdf() {
   fontePdf.value = null;
   pdfCarregando.value = false;
   pdfErro.value = "";
-}
-
-function ativarModelo() {
-  viewMode.value = "modelo";
-  // Mantém o estado do arquivo carregado, mas reseta o zoom/pan para o modelo.
-  pdfZoom.value = 1;
-  pdfCarregando.value = false;
-  pdfErro.value = "";
-  nextTick(() => {
-    const pan = pdfPanBox.value;
-    if (!pan) return;
-    pan.scrollLeft = 0;
-    pan.scrollTop = 0;
-  });
 }
 
 function abrirFicheiro() {
@@ -373,7 +320,6 @@ async function aplicarArquivo(file) {
   if (!file) return;
   dragDepth = 0;
   dragging.value = false;
-  viewMode.value = "file";
 
   const tipo = detectarTipo(file);
   if (tipo === "pdf") {
@@ -451,51 +397,6 @@ onBeforeUnmount(() => {
   gap: 0.75rem;
   min-height: 0;
   flex: 1 1 auto;
-}
-
-.docs__bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.docs__bar-btn {
-  padding: 0.45rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid var(--btn-border);
-  background: rgba(71, 85, 105, 0.12);
-  color: var(--btn-text);
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: background 160ms var(--ease-out, ease), transform 160ms var(--ease-out, ease), box-shadow 160ms var(--ease-out, ease);
-}
-
-.docs__bar-btn:hover {
-  background: rgba(71, 85, 105, 0.24);
-}
-
-.docs__bar-btn:active {
-  transform: translateY(1px);
-}
-
-.docs__bar-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px var(--ring-soft);
-}
-
-.docs__bar-btn[data-active="1"] {
-  background: rgba(96, 165, 250, 0.16);
-  border-color: rgba(96, 165, 250, 0.35);
-}
-
-.docs__tpl-img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  background: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .docs__file-hidden {
