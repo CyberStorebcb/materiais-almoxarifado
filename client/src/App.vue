@@ -3,8 +3,8 @@
     <header class="app__header">
       <div class="app__header-inner">
         <div class="app__title">
-          <h1>Almoxarifado</h1>
-          <p>Documentos (PDF e CAD) e inventário de materiais</p>
+          <h1>FacilControl</h1>
+          <p>ItaloFontes</p>
         </div>
         <nav class="app__actions" aria-label="Navegação rápida">
           <button class="chip" type="button" @click="irParaDocumentos()">Documentos</button>
