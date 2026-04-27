@@ -503,8 +503,8 @@ function clearRows() {
 
 .doc__wrap {
   overflow: auto;
-  border-radius: 12px;
-  border: 1px solid rgba(203, 213, 225, 0.95);
+  border-radius: 2px;
+  border: 1px solid rgba(17, 24, 39, 0.55);
 }
 
 .t {
@@ -515,9 +515,9 @@ function clearRows() {
 
 .t th,
 .t td {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
-  border-right: 1px solid rgba(226, 232, 240, 0.95);
-  padding: 8px 8px;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.55);
+  border-right: 1px solid rgba(17, 24, 39, 0.55);
+  padding: 6px 6px;
   vertical-align: middle;
 }
 
@@ -555,10 +555,23 @@ function clearRows() {
 
 .t__i {
   width: 100%;
-  padding: 7px 8px;
-  border-radius: 10px;
-  border: 1px solid rgba(203, 213, 225, 0.95);
+  padding: 6px 7px;
+  border-radius: 2px;
+  border: 1px solid rgba(17, 24, 39, 0.55);
+  background: #ffffff;
+  color: #000000;
   font-size: 11px;
+  line-height: 1.15;
+}
+
+.t__i:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.20);
+  border-color: rgba(37, 99, 235, 0.95);
+}
+
+.t__i:hover {
+  border-color: rgba(17, 24, 39, 0.85);
 }
 
 .t__i--mono {
