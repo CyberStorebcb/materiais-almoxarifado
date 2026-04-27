@@ -727,8 +727,6 @@ function clearRows() {
 
 @media (max-width: 640px) {
   .doc__top { grid-template-columns: 1fr; }
-  .doc__grid { grid-template-columns: 1fr; }
-  .f--span2 { grid-column: span 1; }
   .dev__grid { grid-template-columns: 1fr; }
 }
 
