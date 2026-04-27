@@ -187,6 +187,7 @@
           <div class="dev__sig">
             <div class="dev__line"></div>
             <div class="dev__label">Assinatura do Entregador:</div>
+            <div class="dev__line"></div>
           </div>
           <div class="dev__mat">
             <div class="dev__matrow"><span class="dev__label">Matrícula:</span><div class="dev__line dev__line--sm"></div></div>
