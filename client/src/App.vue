@@ -151,8 +151,9 @@ async function baixarDocPdf() {
   let canvas;
   try {
     canvas = await html2canvas(el, {
-      // Qualidade: garantir >=2 e permitir até 3
-      scale: Math.min(3, Math.max(2, window.devicePixelRatio || 1)),
+      // Qualidade x tamanho: PNG fica gigantesco; aqui usamos captura moderada
+      // e depois exportamos em JPEG comprimido no PDF.
+      scale: Math.min(2, Math.max(1.5, window.devicePixelRatio || 1)),
       backgroundColor: "#ffffff",
       useCORS: true
     });
@@ -160,8 +161,9 @@ async function baixarDocPdf() {
     el.classList.remove("docprint--export");
   }
 
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  // JPEG reduz drasticamente o tamanho final do PDF
+  const imgData = canvas.toDataURL("image/jpeg", 0.72);
+  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4", compress: true });
 
   const pageW = 297;
   const pageH = 210;
@@ -177,7 +179,8 @@ async function baixarDocPdf() {
   let pageIndex = 0;
   while (remaining > 0) {
     if (pageIndex > 0) pdf.addPage();
-    pdf.addImage(imgData, "PNG", x, y - pageIndex * pageH, usableW, imgH);
+    // FAST compression é mais leve e suficiente para formulário
+    pdf.addImage(imgData, "JPEG", x, y - pageIndex * pageH, usableW, imgH, undefined, "FAST");
     remaining -= pageH;
     pageIndex += 1;
   }
