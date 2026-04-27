@@ -159,18 +159,40 @@
       </div>
     </section>
 
-    <footer class="doc__footer">
-      <div class="sig">
-        <div class="sig__line"></div>
-        <div class="sig__l">Devolução</div>
-      </div>
-      <div class="sig">
-        <div class="sig__line"></div>
-        <div class="sig__l">Assinatura do Encarregado</div>
-      </div>
-      <div class="sig">
-        <div class="sig__line"></div>
-        <div class="sig__l">Assinatura do Conferente</div>
+    <footer class="doc__footer" aria-label="Devolução">
+      <div class="dev">
+        <div class="dev__head">
+          <div class="dev__title">DEVOLUÇÃO</div>
+          <div class="dev__reuse">
+            <span class="dev__reuse-l">Materiais serão reutilizados?</span>
+            <label class="dev__opt"><input v-model="dev.reutiliza" class="dev__radio" type="radio" value="sim" /> <span>Sim</span></label>
+            <label class="dev__opt"><input v-model="dev.reutiliza" class="dev__radio" type="radio" value="nao" /> <span>Não</span></label>
+          </div>
+        </div>
+
+        <div class="dev__row dev__row--date">
+          <span class="dev__small">______ de _________________________ de 20_________</span>
+        </div>
+
+        <div class="dev__grid">
+          <div class="dev__sig">
+            <div class="dev__line"></div>
+            <div class="dev__label">Assinatura do Recebedor:</div>
+          </div>
+          <div class="dev__mat">
+            <div class="dev__matrow"><span class="dev__label">Matrícula:</span><div class="dev__line dev__line--sm"></div></div>
+            <div class="dev__matrow"><span class="dev__label">Matrícula:</span><div class="dev__line dev__line--sm"></div></div>
+          </div>
+
+          <div class="dev__sig">
+            <div class="dev__line"></div>
+            <div class="dev__label">Assinatura do Entregador:</div>
+          </div>
+          <div class="dev__mat">
+            <div class="dev__matrow"><span class="dev__label">Matrícula:</span><div class="dev__line dev__line--sm"></div></div>
+            <div class="dev__matrow"><span class="dev__label">Matrícula:</span><div class="dev__line dev__line--sm"></div></div>
+          </div>
+        </div>
       </div>
     </footer>
   </div>
@@ -203,6 +225,10 @@ const meta = ref({
   pepObra: "",
   dataDevolucao: "",
   observacao: ""
+});
+
+const dev = ref({
+  reutiliza: ""
 });
 
 const rows = ref([]);
@@ -606,30 +632,93 @@ function clearRows() {
 }
 
 .doc__footer {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
   padding: 14px;
-  border-top: 1px solid rgba(226, 232, 240, 0.95);
-  background: #f8fafc;
+  border-top: 1px solid rgba(17, 24, 39, 0.55);
+  background: #ffffff;
 }
 
-.sig {
+.dev__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.dev__title {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+}
+
+.dev__reuse {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.dev__reuse-l {
+  font-weight: 800;
+}
+
+.dev__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.dev__radio {
+  width: 14px;
+  height: 14px;
+}
+
+.dev__row--date {
+  margin: 4px 0 10px;
+}
+
+.dev__small {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dev__grid {
   display: grid;
+  grid-template-columns: 1fr 0.55fr;
+  gap: 10px 18px;
+}
+
+.dev__sig {
+  display: grid;
+  gap: 6px;
+}
+
+.dev__mat {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.dev__matrow {
+  display: grid;
+  grid-template-columns: auto 1fr;
   gap: 8px;
-  align-content: end;
+  align-items: center;
 }
 
-.sig__line {
-  height: 1px;
-  background: rgba(148, 163, 184, 0.95);
-}
-
-.sig__l {
+.dev__label {
   font-size: 11px;
   font-weight: 800;
-  color: #334155;
-  text-align: center;
+}
+
+.dev__line {
+  height: 1px;
+  background: #111827;
+}
+
+.dev__line--sm {
+  height: 1px;
 }
 
 @media (max-width: 1000px) {
@@ -640,7 +729,7 @@ function clearRows() {
   .doc__top { grid-template-columns: 1fr; }
   .doc__grid { grid-template-columns: 1fr; }
   .f--span2 { grid-column: span 1; }
-  .doc__footer { grid-template-columns: 1fr; }
+  .dev__grid { grid-template-columns: 1fr; }
 }
 
 @media print {
